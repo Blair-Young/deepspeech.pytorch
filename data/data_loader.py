@@ -236,10 +236,12 @@ class DistributedBucketingSampler(Sampler):
         self.bins = [self.ids[i:i + batch_size] for i in range(0, len(self.ids), batch_size)]
         self.num_replicas = num_replicas
         self.rank = rank
-        self.num_samples = int(math.ceil(len(self.data_source) * 1.0 / self.num_replicas))
+        self.num_samples = int(math.ceil(len(self.bins) * 1.0 / self.num_replicas))
 
     def __iter__(self):
-        for ids in self.bins:
+        offset = self.num_samples * self.rank
+        for x in range(offset, len(self.bins)):
+            ids = self.bins[x]
             np.random.shuffle(ids)
             yield ids
 
@@ -250,8 +252,8 @@ class DistributedBucketingSampler(Sampler):
         # deterministically shuffle based on epoch
         g = torch.Generator()
         g.manual_seed(epoch)
-        self.ids = list(torch.randperm(len(self.ids), generator=g))
-        self.bins = [self.ids[i:i + self.batch_size] for i in range(0, len(self.ids), self.batch_size)]
+        bin_ids = list(torch.randperm(len(self.bins), generator=g))
+        self.bins = [self.bins[i] for i in bin_ids]
 
 
 def get_audio_length(path):
