@@ -220,7 +220,7 @@ class BucketingSampler(Sampler):
     def __len__(self):
         return len(self.bins)
 
-    def shuffle(self):
+    def shuffle(self, epoch):
         np.random.shuffle(self.bins)
 
 

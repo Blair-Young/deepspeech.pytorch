@@ -232,9 +232,10 @@ if __name__ == '__main__':
     test_loader = AudioDataLoader(test_dataset, batch_size=args.batch_size,
                                   num_workers=args.num_workers)
 
-    if not args.no_shuffle and start_epoch != 0:
+    # TODO temp workaround for distribution, use round-robin for first epoch if distributed
+    if (not args.no_shuffle and start_epoch != 0) or args.distributed:
         print("Shuffling batches for the following epochs")
-        train_sampler.shuffle()
+        train_sampler.shuffle(start_epoch)
 
     if args.cuda:
         model = torch.nn.DataParallel(model).cuda()
@@ -418,4 +419,4 @@ if __name__ == '__main__':
         avg_loss = 0
         if not args.no_shuffle:
             print("Shuffling batches...")
-            train_sampler.shuffle()
+            train_sampler.shuffle(epoch)
