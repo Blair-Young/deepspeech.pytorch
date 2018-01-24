@@ -36,7 +36,10 @@ if args.distributed:
     dist.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
                             world_size=args.world_size, rank=args.rank)
 
-input_data = torch.randn(args.num_samples, 1, 161, args.seconds * 100).cuda()
+if args.distributed:
+    input_data = torch.randn(int(args.num_samples / args.world_size), 1, 161, args.seconds * 100).cuda()
+else:
+    input_data = torch.randn(args.num_samples, 1, 161, args.seconds * 100).cuda()
 input_data = torch.chunk(input_data, int(len(input_data) / args.batch_size))
 
 rnn_type = args.rnn_type.lower()
