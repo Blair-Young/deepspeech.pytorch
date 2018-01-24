@@ -240,7 +240,8 @@ class DistributedBucketingSampler(Sampler):
 
     def __iter__(self):
         offset = self.num_samples * self.rank
-        for x in range(offset, len(self.bins)):
+        samples = self.bins[offset:offset + self.num_samples]
+        for x in samples:
             ids = self.bins[x]
             np.random.shuffle(ids)
             yield ids
