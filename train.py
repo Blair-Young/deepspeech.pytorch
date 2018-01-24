@@ -4,15 +4,15 @@ import json
 import os
 import time
 
-import torch
-from tqdm import tqdm
+import torch.distributed as dist
+import torch.utils.data.distributed
 from torch.autograd import Variable
+from tqdm import tqdm
 from warpctc_pytorch import CTCLoss
+
 from data.data_loader import AudioDataLoader, SpectrogramDataset, BucketingSampler, DistributedBucketingSampler
 from decoder import GreedyDecoder
 from model import DeepSpeech, supported_rnns
-import torch.distributed as dist
-import torch.utils.data.distributed
 
 parser = argparse.ArgumentParser(description='DeepSpeech training')
 parser.add_argument('--train-manifest', metavar='DIR',
